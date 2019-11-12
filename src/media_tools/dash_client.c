@@ -32,6 +32,7 @@
 #include <gpac/base_coding.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <stdio.h>
 
 #ifdef _WIN32_WCE
 #include <winbase.h>
@@ -2953,6 +2954,7 @@ static s32 dash_do_rate_adaptation_legacy_buffer(GF_DashClient *dash, GF_DASH_Gr
 												  u32 dl_rate, Double speed, Double max_available_speed, Bool force_lower_complexity,
 												  GF_MPD_Representation *rep, Bool go_up_bitrate)
 {
+	printf("dash_do_rate_adaptation_legacy_buffer %d %d\n", rep->bandwidth, dl_rate);
 	Bool do_switch;
 	s32 new_index = group->active_rep_index;
 
@@ -7051,14 +7053,17 @@ void gf_dash_set_algo(GF_DashClient *dash, GF_DASHAdaptationAlgorithm algo)
 	dash->adaptation_algorithm = algo;
 	switch (dash->adaptation_algorithm) {
 	case GF_DASH_ALGO_GPAC_LEGACY_BUFFER:
+		printf("GF_DASH_ALGO_GPAC_LEGACY_BUFFER\n");
 		dash->rate_adaptation_algo = dash_do_rate_adaptation_legacy_buffer;
 		dash->rate_adaptation_download_monitor = dash_do_rate_monitor_default;
 		break;
 	case GF_DASH_ALGO_GPAC_LEGACY_RATE:
+		printf("GF_DASH_ALGO_GPAC_LEGACY_RATE\n");
 		dash->rate_adaptation_algo = dash_do_rate_adaptation_legacy_rate;
 		dash->rate_adaptation_download_monitor = dash_do_rate_monitor_default;
 		break;
 	case GF_DASH_ALGO_BBA0:
+		printf("GF_DASH_ALGO_BBA0\n");
 		dash->rate_adaptation_algo = dash_do_rate_adaptation_bba0;
 		dash->rate_adaptation_download_monitor = dash_do_rate_monitor_default;
 		break;
@@ -7066,6 +7071,7 @@ void gf_dash_set_algo(GF_DashClient *dash, GF_DASHAdaptationAlgorithm algo)
 	case GF_DASH_ALGO_BOLA_BASIC:
 	case GF_DASH_ALGO_BOLA_U:
 	case GF_DASH_ALGO_BOLA_O:
+		printf("GF_DASH_ALGO_BOLA_O\n");
 		dash->rate_adaptation_algo = dash_do_rate_adaptation_bola;
 		dash->rate_adaptation_download_monitor = dash_do_rate_monitor_default;
 		break;
