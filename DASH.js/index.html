@@ -1,0 +1,74 @@
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>DASH.js Player</title>
+
+<style>
+    video {
+        width: 1280px;
+        height: 720px;
+    }
+</style>
+</head>
+
+<body>
+    <div class="videoContainer" id="videoContainer">
+        <video class="dashjs-player" id="videoPlayer" autoplay="true"></video>
+        <div id="videoController" class="video-controller unselectable">
+            <div id="playPauseBtn" class="btn-play-pause" title="Play/Pause">
+                <span id="iconPlayPause" class="icon-play"></span>
+            </div>
+            <span id="videoTime" class="time-display">00:00:00</span>
+            <div id="fullscreenBtn" class="btn-fullscreen control-icon-layout" title="Fullscreen">
+                <span class="icon-fullscreen-enter"></span>
+            </div>
+            <div id="bitrateListBtn" class="control-icon-layout" title="Bitrate List">
+                <span class="icon-bitrate"></span>
+            </div>
+            <input type="range" id="volumebar" class="volumebar" value="1" min="0" max="1" step=".01">
+            <div id="muteBtn" class="btn-mute control-icon-layout" title="Mute">
+                <span id="iconMute" class="icon-mute-off"></span>
+            </div>
+            <div id="trackSwitchBtn" class="control-icon-layout" title="A/V Tracks">
+                <span class="icon-tracks"></span>
+            </div>
+            <div id="captionBtn" class="btn-caption control-icon-layout" title="Closed Caption">
+                <span class="icon-caption"></span>
+            </div>
+            <span id="videoDuration" class="duration-display">00:00:00</span>
+            <div class="seekContainer">
+                <div id="seekbar" class="seekbar seekbar-complete">
+                    <div id="seekbar-buffer" class="seekbar seekbar-buffer"></div>
+                    <div id="seekbar-play" class="seekbar seekbar-play"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="code">
+        <span id="stats"></span>
+    </div>
+
+    <script src="dash.all.debug.js"></script>
+    <link rel="stylesheet" href="controlbar.css">
+    <script src="ControlBar.js"></script>
+    <script class="code">
+    var url = "http://127.0.0.1:8080/dash.mpd";
+    // var url = "https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd";
+    var player = dashjs.MediaPlayer().create();
+    setInterval(updateStats,500);
+    function updateStats()
+    {
+        var stats_text =
+            "<br>Buffer Length(s) " + player.getBufferLength() +
+            "<br>Volume " + player.getVolume() +
+            "<br>DVR Window Size(s) " + player.getDVRWindowSize() +
+            "<br>Current Time(s) " + player.time() +
+            "<br>Duration(s) " + player.duration();
+        document.querySelector("#stats").innerHTML = stats_text;
+    }
+    player.initialize(document.querySelector(".videoContainer video"), url, true);
+    var controlbar = new ControlBar(player);
+    controlbar.initialize();
+    </script>
+</body>
+</html>
