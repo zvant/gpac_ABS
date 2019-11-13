@@ -82,6 +82,7 @@ include/gpac/revision.h.new
 extra_lib/lib/
 extra_lib/include/SDL/
 extra_lib/include/ios/
+extra_lib/include/xulrunner-sdk/
 config.mak
 configure-stamp
 gpac.pc

@@ -1206,6 +1206,10 @@ static void progress_quiet(const void *cbck, const char *title, u64 done, u64 to
 
 int mp4client_main(int argc, char **argv)
 {
+	printf("[DEBUG] mp4client_main entry\n");
+	for (int i = 0; i < argc; i++) {
+		printf("[DEBUG] ARGS %d %s\n", i, argv[i]);
+	}
 	char c;
 	const char *str;
 	int ret_val = 0;
