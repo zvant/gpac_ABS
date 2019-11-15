@@ -2950,14 +2950,23 @@ static s32 dash_do_rate_adaptation_legacy_rate(GF_DashClient *dash, GF_DASH_Grou
 	return new_index;
 }
 
+unsigned int call_count = 1;
+
 static s32 dash_do_rate_adaptation_legacy_buffer(GF_DashClient *dash, GF_DASH_Group *group, GF_DASH_Group *base_group,
 												  u32 dl_rate, Double speed, Double max_available_speed, Bool force_lower_complexity,
 												  GF_MPD_Representation *rep, Bool go_up_bitrate)
 {
-	printf("[DEBUG] dash_do_rate_adaptation_legacy_buffer\n"
-		"DownloadRate %d Speed %lf MaxSpeed %lf\n"
-		"ID %s Bandwidth %d Rank %d\n",
-		dl_rate, speed, max_available_speed, rep->id, rep->bandwidth, rep->quality_ranking);
+	printf(
+		"[DEBUG] (%d) dash_do_rate_adaptation_legacy_buffer\n"
+		"        DownloadRate %d Speed %lf MaxSpeed %lf\n"
+		"        ID %s Bandwidth %d Rank %d\n"
+		"        BufferMin %d BufferMax %d\n"
+		"        BufferOcc %d BufferOccLastSeq %d\n",
+		call_count ++, dl_rate, speed, max_available_speed,
+		rep->id, rep->bandwidth, rep->quality_ranking,
+		group->buffer_min_ms, group->buffer_max_ms,
+		group->buffer_occupancy_ms, group->buffer_occupancy_at_last_seg);
+
 	Bool do_switch;
 	s32 new_index = group->active_rep_index;
 
@@ -3027,7 +3036,7 @@ static s32 dash_do_rate_adaptation_legacy_buffer(GF_DashClient *dash, GF_DASH_Gr
 		new_index = dash_do_rate_adaptation_legacy_rate(dash, group, base_group, dl_rate, speed, max_available_speed, force_lower_complexity, rep, go_up_bitrate);
 	}
 
-	printf("new index %d\n", new_index);
+	printf("        new index %d\n", new_index);
 	return new_index;
 }
 

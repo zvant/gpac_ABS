@@ -1,5 +1,6 @@
-ffmpeg -i input.mp4 -acodec aac -vcodec libx264 -vf scale=1280:720 720P.mp4
-ffmpeg -i input.mp4 -acodec aac -vcodec libx264 -vf scale=854:480 480P.mp4
-ffmpeg -i input.mp4 -acodec aac -vcodec libx264 -vf scale=640:360 360P.mp4
-MP4Box -dash 8000 -rap -frag-rap -profile live -out dash.mpd ../720P.mp4#video ../720P.mp4#audio ../480P.mp4#video ../480P.mp4#audio ../360P.mp4#video ../360P.mp4#audio
+ffmpeg -i input.mp4 -acodec aac -vcodec libx264 -vf "drawtext=text='360P %{eif\:t\:d}':fontcolor=white: fontsize=24:box=1:boxcolor=black:boxborderw=5:x=10:y=h-34, scale=640:360" 360P.mp4
+ffmpeg -i input.mp4 -acodec aac -vcodec libx264 -vf "drawtext=text='480P %{eif\:t\:d}':fontcolor=white: fontsize=24:box=1:boxcolor=black:boxborderw=5:x=10:y=h-34, scale=854:480" 480P.mp4
+ffmpeg -i input.mp4 -acodec aac -vcodec libx264 -vf "drawtext=text='720P %{eif\:t\:d}':fontcolor=white: fontsize=24:box=1:boxcolor=black:boxborderw=5:x=10:y=h-34, scale=1280:720" 720P.mp4
+ffmpeg -i input.mp4 -acodec aac -vcodec libx264 -vf "drawtext=text='900P %{eif\:t\:d}':fontcolor=white: fontsize=24:box=1:boxcolor=black:boxborderw=5:x=10:y=h-34, scale=1600:900" 900P.mp4
+MP4Box -dash 8000 -rap -frag-rap -profile live -out dash.mpd ../900P.mp4#video ../720P.mp4#video ../480P.mp4#video ../360P.mp4#video
 python3 -m http.server 8080
