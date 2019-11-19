@@ -2957,13 +2957,15 @@ static s32 dash_do_rate_adaptation_legacy_buffer(GF_DashClient *dash, GF_DASH_Gr
 												  GF_MPD_Representation *rep, Bool go_up_bitrate)
 {
 	printf(
-		"[DEBUG] (%d) dash_do_rate_adaptation_legacy_buffer\n"
+		"[DEBUG] dash_do_rate_adaptation_legacy_buffer #%d @%lld\n"
 		"        DownloadRate %d Speed %lf MaxSpeed %lf\n"
 		"        ID %s Bandwidth %d Rank %d\n"
+		"        Length %lld Bps %d\n"
 		"        BufferMin %d BufferMax %d\n"
 		"        BufferOcc %d BufferOccLastSeq %d\n",
-		call_count ++, dl_rate, speed, max_available_speed,
+		call_count ++, time(NULL), dl_rate, speed, max_available_speed,
 		rep->id, rep->bandwidth, rep->quality_ranking,
+		group->current_downloaded_segment_duration, group->bytes_per_sec,
 		group->buffer_min_ms, group->buffer_max_ms,
 		group->buffer_occupancy_ms, group->buffer_occupancy_at_last_seg);
 
