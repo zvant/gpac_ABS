@@ -2950,7 +2950,83 @@ static s32 dash_do_rate_adaptation_legacy_rate(GF_DashClient *dash, GF_DASH_Grou
 	return new_index;
 }
 
-unsigned int call_count = 1;
+unsigned int dash_algo_call_count = 1;
+
+int D0 = -1;
+int D1 = -1;
+int D2 = -1;
+double * rl_W1 = NULL;
+double * rl_b1 = NULL;
+double * rl_W2 = NULL;
+double * rl_b2 = NULL;
+const char * dash_algo_rl_model_filename = "rl_weights.txt";
+
+static void dash_rl_read_model(void)
+{
+	FILE * fp = NULL;
+	if (NULL == (fp = fopen(dash_algo_rl_model_filename, "r"))) {
+		printf("[ERROR] Learned model file cannot be read.\n");
+		return;
+	}
+	printf("[RL] reading weights & biases from %s\n", dash_algo_rl_model_filename);
+	fscanf(fp, "%ld %ld", &D0, &D1);
+	printf("     layer 1: %ld x %ld\n     W1 =\n", D0, D1);
+	rl_W1 = (double *)malloc(D0 * D1 * sizeof(double));
+	for (int i = 0; i < D1; i++) {
+		printf("     ");
+		for (int j = 0; j < D0; j++) {
+			fscanf(fp, "%lf", rl_W1 + D0 * i + j);
+			printf("%lf ", rl_W1[D0 * i + j]);
+		}
+		printf("\n");
+	}
+	rl_b1 = (double *)malloc(D1 * sizeof(double));
+	printf("     b1^T = ");
+	for (int i = 0; i < D1; i++) {
+		fscanf(fp, "%lf", rl_b1 + i);
+		printf("%lf ", rl_b1[i]);
+	}
+
+	fscanf(fp, "%ld %ld", &D1, &D2);
+	printf("\n     layer 2: %ld x %ld\n     W2 =\n", D1, D2);
+	rl_W2 = (double *)malloc(D1 * D2 * sizeof(double));
+	for (int i = 0; i < D2; i++) {
+		printf("     ");
+		for (int j = 0; j < D1; j++) {
+			fscanf(fp, "%lf", rl_W2 + D1 * i + j);
+			printf("%lf ", rl_W2[D1 * i + j]);
+		}
+		printf("\n");
+	}
+	rl_b2 = (double *)malloc(D2 * sizeof(double));
+	printf("     b2^T = ");
+	for (int i = 0; i < D2; i++) {
+		fscanf(fp, "%lf", rl_b2 + i);
+		printf("%lf ", rl_b2[i]);
+	}
+	printf("\n");
+	fclose(fp);
+	return;
+}
+
+static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group, GF_DASH_Group *base_group,
+									u32 dl_rate, Double speed, Double max_available_speed, Bool force_lower_complexity,
+									GF_MPD_Representation *rep, Bool go_up_bitrate)
+{
+	printf(
+		"[DEBUG] dash_do_rate_adaptation_legacy_buffer #%d @%lld\n"
+		"        DownloadRate %d Speed %lf MaxSpeed %lf\n"
+		"        ID %s Bandwidth %d Rank %d\n"
+		"        Length %lld Bps %d\n"
+		"        BufferMin %d BufferMax %d\n"
+		"        BufferOcc %d BufferOccLastSeq %d\n",
+		dash_algo_call_count++, time(NULL), dl_rate, speed, max_available_speed,
+		rep->id, rep->bandwidth, rep->quality_ranking,
+		group->current_downloaded_segment_duration, group->bytes_per_sec,
+		group->buffer_min_ms, group->buffer_max_ms,
+		group->buffer_occupancy_ms, group->buffer_occupancy_at_last_seg);
+	return 2;
+}
 
 static s32 dash_do_rate_adaptation_legacy_buffer(GF_DashClient *dash, GF_DASH_Group *group, GF_DASH_Group *base_group,
 												  u32 dl_rate, Double speed, Double max_available_speed, Bool force_lower_complexity,
@@ -2963,7 +3039,7 @@ static s32 dash_do_rate_adaptation_legacy_buffer(GF_DashClient *dash, GF_DASH_Gr
 		"        Length %lld Bps %d\n"
 		"        BufferMin %d BufferMax %d\n"
 		"        BufferOcc %d BufferOccLastSeq %d\n",
-		call_count ++, time(NULL), dl_rate, speed, max_available_speed,
+		dash_algo_call_count ++, time(NULL), dl_rate, speed, max_available_speed,
 		rep->id, rep->bandwidth, rep->quality_ranking,
 		group->current_downloaded_segment_duration, group->bytes_per_sec,
 		group->buffer_min_ms, group->buffer_max_ms,
@@ -7088,6 +7164,12 @@ void gf_dash_set_algo(GF_DashClient *dash, GF_DASHAdaptationAlgorithm algo)
 	case GF_DASH_ALGO_BOLA_O:
 		printf("[DEBUG] GF_DASH_ALGO_BOLA_O\n");
 		dash->rate_adaptation_algo = dash_do_rate_adaptation_bola;
+		dash->rate_adaptation_download_monitor = dash_do_rate_monitor_default;
+		break;
+	case GF_DASH_ALGO_RL:
+		printf("[DEBUG] GF_DASH_ALGO_RL\n");
+		dash_rl_read_model();
+		dash->rate_adaptation_algo = dash_do_rate_adaptation_rl;
 		dash->rate_adaptation_download_monitor = dash_do_rate_monitor_default;
 		break;
 	case GF_DASH_ALGO_NONE:

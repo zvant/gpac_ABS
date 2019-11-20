@@ -89,3 +89,5 @@ gpac.pc
 tests/external_media/
 tests/results/
 
+# learned models
+rl_weights.txt
