@@ -2,9 +2,9 @@ ffmpeg -i input.mp4 -an -vcodec libx264 -vf "drawtext=text='360P %{eif\:t\:d}':f
 x264 --output 360P.264 --fps 24 --preset slow --bitrate 800 --vbv-maxrate 1600 --vbv-bufsize 3200 --min-keyint 48 --keyint 48 --scenecut 0 --no-scenecut --pass 1 360P_text.mp4
 MP4Box -add 360P.264 -fps 24 360P.mp4
 
-ffmpeg -i input.mp4 -an -vcodec libx264 -vf "drawtext=text='480P %{eif\:t\:d}':fontcolor=white: fontsize=24:box=1:boxcolor=black:boxborderw=5:x=10:y=h-34, scale=854:480" 480P_text.mp4
-x264 --output 480P.264 --fps 24 --preset slow --bitrate 1200 --vbv-maxrate 2400 --vbv-bufsize 4800 --min-keyint 48 --keyint 48 --scenecut 0 --no-scenecut --pass 1 480P_text.mp4
-MP4Box -add 480P.264 -fps 24 480P.mp4
+ffmpeg -i input.mp4 -an -vcodec libx264 -vf "drawtext=text='450P %{eif\:t\:d}':fontcolor=white: fontsize=24:box=1:boxcolor=black:boxborderw=5:x=10:y=h-34, scale=800:450" 450P_text.mp4
+x264 --output 450P.264 --fps 24 --preset slow --bitrate 1000 --vbv-maxrate 2000 --vbv-bufsize 4000 --min-keyint 48 --keyint 48 --scenecut 0 --no-scenecut --pass 1 450P_text.mp4
+MP4Box -add 450P.264 -fps 24 450P.mp4
 
 ffmpeg -i input.mp4 -an -vcodec libx264 -vf "drawtext=text='720P %{eif\:t\:d}':fontcolor=white: fontsize=24:box=1:boxcolor=black:boxborderw=5:x=10:y=h-34, scale=1280:720" 720P_text.mp4
 x264 --output 720P.264 --fps 24 --preset slow --bitrate 2000 --vbv-maxrate 4000 --vbv-bufsize 8000 --min-keyint 48 --keyint 48 --scenecut 0 --no-scenecut --pass 1 720P_text.mp4
@@ -14,7 +14,7 @@ ffmpeg -i input.mp4 -an -vcodec libx264 -vf "drawtext=text='900P %{eif\:t\:d}':f
 x264 --output 900P.264 --fps 24 --preset slow --bitrate 2800 --vbv-maxrate 5600 --vbv-bufsize 11200 --min-keyint 48 --keyint 48 --scenecut 0 --no-scenecut --pass 1 900P_text.mp4
 MP4Box -add 900P.264 -fps 24 900P.mp4
 
-MP4Box -dash 4000 -rap -frag-rap -profile live -out dash.mpd ../900P.mp4#video ../720P.mp4#video ../480P.mp4#video ../360P.mp4#video
+MP4Box -dash 4000 -rap -frag-rap -profile live -out dash.mpd ../900P.mp4#video ../720P.mp4#video ../450P.mp4#video ../360P.mp4#video
 python3 -m http.server 8080
 
 
