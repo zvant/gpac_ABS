@@ -91,3 +91,4 @@ tests/results/
 
 # learned models
 rl_weights.txt
+*.pyc

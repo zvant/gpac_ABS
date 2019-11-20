@@ -2950,11 +2950,16 @@ static s32 dash_do_rate_adaptation_legacy_rate(GF_DashClient *dash, GF_DASH_Grou
 	return new_index;
 }
 
+/* current DASH iteration count */
 unsigned int dash_algo_call_count = 1;
 
-int D0 = -1;
-int D1 = -1;
-int D2 = -1;
+/* model parameters */
+int rl_D0 = -1;
+int rl_D1 = -1;
+int rl_D2 = -1;
+double * rl_X = NULL;
+double * rl_h = NULL;
+double * rl_y = NULL;
 double * rl_W1 = NULL;
 double * rl_b1 = NULL;
 double * rl_W2 = NULL;
@@ -2969,44 +2974,91 @@ static void dash_rl_read_model(void)
 		return;
 	}
 	printf("[RL] reading weights & biases from %s\n", dash_algo_rl_model_filename);
-	fscanf(fp, "%ld %ld", &D0, &D1);
-	printf("     layer 1: %ld x %ld\n     W1 =\n", D0, D1);
-	rl_W1 = (double *)malloc(D0 * D1 * sizeof(double));
-	for (int i = 0; i < D1; i++) {
-		printf("     ");
-		for (int j = 0; j < D0; j++) {
-			fscanf(fp, "%lf", rl_W1 + D0 * i + j);
-			printf("%lf ", rl_W1[D0 * i + j]);
+	fscanf(fp, "%ld %ld", &rl_D0, &rl_D1);
+	printf("     layer 1: %ld x %ld\n", rl_D0, rl_D1);
+	rl_W1 = (double *)malloc(rl_D0 * rl_D1 * sizeof(double));
+	for (int i = 0; i < rl_D1; i++) {
+		for (int j = 0; j < rl_D0; j++) {
+			fscanf(fp, "%lf", rl_W1 + rl_D0 * i + j);
 		}
-		printf("\n");
 	}
-	rl_b1 = (double *)malloc(D1 * sizeof(double));
-	printf("     b1^T = ");
-	for (int i = 0; i < D1; i++) {
+	rl_b1 = (double *)malloc(rl_D1 * sizeof(double));
+	for (int i = 0; i < rl_D1; i++) {
 		fscanf(fp, "%lf", rl_b1 + i);
-		printf("%lf ", rl_b1[i]);
 	}
 
-	fscanf(fp, "%ld %ld", &D1, &D2);
-	printf("\n     layer 2: %ld x %ld\n     W2 =\n", D1, D2);
-	rl_W2 = (double *)malloc(D1 * D2 * sizeof(double));
-	for (int i = 0; i < D2; i++) {
+	fscanf(fp, "%ld %ld", &rl_D1, &rl_D2);
+	printf("     layer 2: %ld x %ld\n", rl_D1, rl_D2);
+	rl_W2 = (double *)malloc(rl_D1 * rl_D2 * sizeof(double));
+	for (int i = 0; i < rl_D2; i++) {
 		printf("     ");
-		for (int j = 0; j < D1; j++) {
-			fscanf(fp, "%lf", rl_W2 + D1 * i + j);
-			printf("%lf ", rl_W2[D1 * i + j]);
+		for (int j = 0; j < rl_D1; j++) {
+			fscanf(fp, "%lf", rl_W2 + rl_D1 * i + j);
 		}
-		printf("\n");
 	}
-	rl_b2 = (double *)malloc(D2 * sizeof(double));
-	printf("     b2^T = ");
-	for (int i = 0; i < D2; i++) {
+	rl_b2 = (double *)malloc(rl_D2 * sizeof(double));
+	for (int i = 0; i < rl_D2; i++) {
 		fscanf(fp, "%lf", rl_b2 + i);
-		printf("%lf ", rl_b2[i]);
 	}
-	printf("\n");
 	fclose(fp);
-	return;
+	rl_X = (double *)malloc(rl_D0 * sizeof(double));
+	rl_h = (double *)malloc(rl_D1 * sizeof(double));
+	rl_y = (double *)malloc(rl_D2 * sizeof(double));
+}
+
+/* model inputs, the current state */
+struct {
+	int HISTORY_SIZE;
+	int count;
+	double * downloadrates;
+	double * bitrates;
+	double * buffersizes;
+} rl_state_history;
+const int rl_HISTORY_SIZE = 5;
+
+/* initialize history states structure */
+static void rl_build_state(void)
+{
+	rl_state_history.HISTORY_SIZE = rl_HISTORY_SIZE;
+	rl_state_history.count = 0;
+	rl_state_history.downloadrates = (double *)malloc(rl_state_history.HISTORY_SIZE * sizeof(double));
+	rl_state_history.bitrates = (double *)malloc(rl_state_history.HISTORY_SIZE * sizeof(double));
+	rl_state_history.buffersizes = (double *)malloc(rl_state_history.HISTORY_SIZE * sizeof(double));
+}
+
+/* add current state to history */
+static void rl_add_state(double current_downloadrate, double current_bitrate, double current_buffersize)
+{
+	if (rl_state_history.count < rl_state_history.HISTORY_SIZE) {
+		for (int i = 0; i < rl_state_history.HISTORY_SIZE; i++) {
+			rl_state_history.downloadrates[i] = current_downloadrate;
+			rl_state_history.bitrates[i] = current_bitrate;
+			rl_state_history.buffersizes[i] = current_buffersize;
+		}
+		rl_state_history.count = rl_state_history.HISTORY_SIZE;
+	}
+	else {
+		for (int i = 0; i < rl_state_history.HISTORY_SIZE - 1; i++) {
+			rl_state_history.downloadrates[i] = rl_state_history.downloadrates[i + 1];
+			rl_state_history.bitrates[i] = rl_state_history.bitrates[i + 1];
+			rl_state_history.buffersizes[i] = rl_state_history.buffersizes[i + 1];
+		}
+		rl_state_history.downloadrates[rl_state_history.HISTORY_SIZE - 1] = current_downloadrate;
+		rl_state_history.bitrates[rl_state_history.HISTORY_SIZE - 1] = current_bitrate;
+		rl_state_history.buffersizes[rl_state_history.HISTORY_SIZE - 1] = current_buffersize;
+	}
+}
+
+/* construct state vector for model input [d1,b1,t1,d2,b2,t2,...,a]
+   dose NOT check array boundary */
+static void rl_get_state(double * state, int action)
+{
+	for (int t = 0; t < rl_state_history.HISTORY_SIZE; t++) {
+		state[t * 3] = rl_state_history.downloadrates[t] / 1.0e5;
+		state[t * 3 + 1] = rl_state_history.bitrates[t] / 1.0e5;
+		state[t * 3 + 2] = rl_state_history.buffersizes[t] / 1.0e3;
+	}
+	state[rl_state_history.HISTORY_SIZE * 3] = action * 1.0e1;
 }
 
 static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group, GF_DASH_Group *base_group,
@@ -3017,15 +3069,58 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 		"[DEBUG] dash_do_rate_adaptation_legacy_buffer #%d @%lld\n"
 		"        DownloadRate %d Speed %lf MaxSpeed %lf\n"
 		"        ID %s Bandwidth %d Rank %d\n"
-		"        Length %lld Bps %d\n"
+		"        Length %lld Bps %d ActiveRepIdx %d ActiveBR %d\n"
 		"        BufferMin %d BufferMax %d\n"
-		"        BufferOcc %d BufferOccLastSeq %d\n",
-		dash_algo_call_count++, time(NULL), dl_rate, speed, max_available_speed,
+		"        BufferOcc %d BufferOccLastSeq %d\n"
+		"        ListCount %d\n",
+		dash_algo_call_count++, time(NULL),
+		dl_rate, speed, max_available_speed,
 		rep->id, rep->bandwidth, rep->quality_ranking,
-		group->current_downloaded_segment_duration, group->bytes_per_sec,
+		group->current_downloaded_segment_duration, group->bytes_per_sec, group->active_rep_index, group->active_bitrate,
 		group->buffer_min_ms, group->buffer_max_ms,
-		group->buffer_occupancy_ms, group->buffer_occupancy_at_last_seg);
-	return 2;
+		group->buffer_occupancy_ms, group->buffer_occupancy_at_last_seg,
+		gf_list_count(group->adaptation_set->representations));
+
+	/* evaluate actions using Q-network */
+	rl_add_state(dl_rate, group->active_bitrate, group->buffer_occupancy_ms);
+	int actions[3] = { -1, 0, 1 };
+	double values[3];
+	int max_val_idx = 0;
+	for (int ia = 0; ia < 3; ia++) {
+		rl_get_state(rl_X, actions[ia]);
+		/*for (int i = 0; i <= rl_state_history.HISTORY_SIZE * 3; i++) {
+		printf("%f,", rl_X[i]);
+		}
+		printf("\n");*/
+		for (int ih = 0; ih < rl_D1; ih++) {
+			rl_h[ih] = rl_b1[ih];
+			for (int k = 0; k < rl_D0; k++) {
+				rl_h[ih] += rl_W1[ih * rl_D1 + k] * rl_X[k];
+			}
+			//// ReLU
+			//if (rl_h[ih] < 0.0) {
+			//	rl_h[ih] = 0.0;
+			//}
+
+			//Sigmoid
+			rl_h[ih] = 1.0 / (1 + pow(2.71828, -1 * rl_h[ih]));
+		}
+		values[ia] = rl_b2[0];
+		for (int k = 0; k < rl_D1; k++) {
+			values[ia] += rl_W2[k] * rl_h[k];
+		}
+		printf("action %d value %lf\n", actions[ia], values[ia]);
+		if (values[ia] > values[max_val_idx]) {
+			max_val_idx = ia;
+		}
+	}
+
+	int new_index = group->active_rep_index + actions[max_val_idx];
+	int list_count = gf_list_count(group->adaptation_set->representations);
+	new_index = (new_index < 0) ? 0 : new_index;
+	new_index = (new_index >= list_count) ? (list_count - 1) : new_index;
+	printf("        action %d new index %d\n", actions[max_val_idx], new_index);
+	return new_index;
 }
 
 static s32 dash_do_rate_adaptation_legacy_buffer(GF_DashClient *dash, GF_DASH_Group *group, GF_DASH_Group *base_group,
@@ -3036,14 +3131,17 @@ static s32 dash_do_rate_adaptation_legacy_buffer(GF_DashClient *dash, GF_DASH_Gr
 		"[DEBUG] dash_do_rate_adaptation_legacy_buffer #%d @%lld\n"
 		"        DownloadRate %d Speed %lf MaxSpeed %lf\n"
 		"        ID %s Bandwidth %d Rank %d\n"
-		"        Length %lld Bps %d\n"
+		"        Length %lld Bps %d ActiveRepIdx %d ActiveBR %d\n"
 		"        BufferMin %d BufferMax %d\n"
-		"        BufferOcc %d BufferOccLastSeq %d\n",
-		dash_algo_call_count ++, time(NULL), dl_rate, speed, max_available_speed,
+		"        BufferOcc %d BufferOccLastSeq %d\n"
+		"        ListCount %d\n",
+		dash_algo_call_count ++, time(NULL),
+		dl_rate, speed, max_available_speed,
 		rep->id, rep->bandwidth, rep->quality_ranking,
-		group->current_downloaded_segment_duration, group->bytes_per_sec,
+		group->current_downloaded_segment_duration, group->bytes_per_sec, group->active_rep_index, group->active_bitrate,
 		group->buffer_min_ms, group->buffer_max_ms,
-		group->buffer_occupancy_ms, group->buffer_occupancy_at_last_seg);
+		group->buffer_occupancy_ms, group->buffer_occupancy_at_last_seg,
+		gf_list_count(group->adaptation_set->representations));
 
 	Bool do_switch;
 	s32 new_index = group->active_rep_index;
@@ -3112,9 +3210,9 @@ static s32 dash_do_rate_adaptation_legacy_buffer(GF_DashClient *dash, GF_DASH_Gr
 	   we apply rate-based adaptation */
 	if (do_switch) {
 		new_index = dash_do_rate_adaptation_legacy_rate(dash, group, base_group, dl_rate, speed, max_available_speed, force_lower_complexity, rep, go_up_bitrate);
+		printf("        use rate-based adaptation\n");
 	}
-
-	printf("        new index %d\n", new_index);
+	printf("        bitrate go-up %d new index %d\n", go_up_bitrate, new_index);
 	return new_index;
 }
 
@@ -7169,6 +7267,7 @@ void gf_dash_set_algo(GF_DashClient *dash, GF_DASHAdaptationAlgorithm algo)
 	case GF_DASH_ALGO_RL:
 		printf("[DEBUG] GF_DASH_ALGO_RL\n");
 		dash_rl_read_model();
+		rl_build_state();
 		dash->rate_adaptation_algo = dash_do_rate_adaptation_rl;
 		dash->rate_adaptation_download_monitor = dash_do_rate_monitor_default;
 		break;
