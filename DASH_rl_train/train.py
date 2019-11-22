@@ -1,6 +1,7 @@
 #!python3
 
 import os
+import shutil
 from model import torch, np, DQN
 
 weights_filename = 'rl_weights.txt'
@@ -11,26 +12,34 @@ command = 'bin\\x64\\release\\mp4client.exe -run-for 40 -exit -c GPAC.cfg -logs 
 def train():
     model = DQN()
 
-    for episode in range(0, 16):
-        with open(transitions_filename, 'w') as fp:
-            pass
+    for episode in range(0, 200):
         model.dump_weights(weights_filename)
         with open(weights_filename, 'a') as fp:
-            fp.write('%f\n' % (0.85 ** episode))
+            fp.write('%f %s\n' % (0.85 ** episode, model.activate_desc))
+        if (episode % 5) == 0:
+            shutil.copyfile(weights_filename, 'rl_dqn_model_ep_%d.txt' % episode)
+        with open(transitions_filename, 'w') as fp:
+            pass
         os.system(command)
 
-        t, Xt, Rt, Xt1 = [], [], [], []
+        t, Xt, At, Rt, Xt1 = [], [], [], [], []
         with open(transitions_filename, 'r') as fp:
             lines = list(map(lambda l: l.strip(), fp.readlines()))
+            if len(lines) < 12:
+                print('Not enough data for training, skipped')
+                continue
             assert (len(lines) % 4) == 0, 'corrupted transitions file: %s' % transitions_filename
             for idx in range(0, len(lines) // 4):
                 t.append(int(lines[idx * 4].split(' ')[1]))
                 Xt.append(list(map(float, lines[idx * 4 + 1].split(' '))))
-                Rt.append(float(lines[idx * 4 + 2]))
+                a, r = map(float, lines[idx * 4 + 2].split(' '))
+                At.append(a)
+                Rt.append(r)
                 Xt1.append(list(map(float, lines[idx * 4 + 3].split(' '))))
 
-        t, Xt, Rt, Xt1 = map(lambda l: np.array(l), [t, Xt, Rt, Xt1])
-        loss = model.train_Xy(Xt, Rt, Xt1)
+        t, Xt, Rt, Xt1 = map(lambda l: np.array(l, dtype=np.float), [t, Xt, Rt, Xt1])
+        At = np.array(At, dtype=np.int)
+        loss = model.train_Xy(Xt, At, Rt, Xt1)
 
         with open(train_log_filename, 'a') as fp:
             fp.write('%d,%d,%f\n' % (episode, t.shape[0], loss))

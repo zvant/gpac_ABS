@@ -90,6 +90,7 @@ tests/external_media/
 tests/results/
 
 # learned models
-rl_weights.txt
-rl_transitions.txt
+*.txt
+*.npz
+*.npy
 *.pyc

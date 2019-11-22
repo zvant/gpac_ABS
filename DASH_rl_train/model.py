@@ -18,17 +18,21 @@ class DQN(nn.Module):
             self.float = torch.FloatTensor
             self.long = torch.LongTensor
 
-        self.input_dim = 5 * 3 + 1
+        self.input_dim = 5 * 3
         self.hidden_dim = 32
+        self.output_dim = 3
         self.fc1 = nn.Linear(self.input_dim, self.hidden_dim)
-        self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(self.hidden_dim, 1)
+        # self.activate = nn.ReLU()
+        # self.activate_desc = 'r'
+        self.activate = nn.Sigmoid()
+        self.activate_desc = 's'
+        self.fc2 = nn.Linear(self.hidden_dim, self.output_dim)
 
         self.loss_fn = nn.MSELoss()
         self.init_weights()
         self.lr = 3.0e-3
         self.optimizer = optim.Adam(self.parameters(), lr=self.lr)
-        self.gamma = 0.25
+        self.gamma = 0.75
         self.type(self.float)
 
     def init_weights(self):
@@ -37,27 +41,28 @@ class DQN(nn.Module):
 
     def forward(self, X):
         X = self.fc1(X)
-        X = self.relu(X)
+        X = self.activate(X)
         return self.fc2(X)
 
-    def train_Xy(self, Xt, Rt, Xt1, batchsize=None):
+    def train_Xy(self, Xt, At, Rt, Xt1, batchsize=None):
         N = Xt.shape[0]
         if batchsize is None:
             batchsize = N
-        Xt, Rt, Xt1 = shuffle(Xt, Rt, Xt1)
+        Xt, At, Rt, Xt1 = shuffle(Xt, At, Rt, Xt1)
         Xt, Rt, Xt1 = map(lambda arr: torch.from_numpy(arr).type(self.float), [Xt, Rt, Xt1])
+        At = torch.from_numpy(At).type(self.long)
 
         avg_loss = []
 
         for idx in range(0, N // batchsize):
-            y = self(Xt[idx * batchsize : (idx + 1) * batchsize]).view(batchsize,)
-            r = Rt[idx * batchsize : (idx + 1) * batchsize].view(batchsize,)
+            a = At[idx * batchsize : (idx + 1) * batchsize]
+            y = self(Xt[idx * batchsize : (idx + 1) * batchsize])
+            r = Rt[idx * batchsize : (idx + 1) * batchsize]
+            for iy in range(0, batchsize):
+                y[iy][0] = y[iy][a[iy]]
+            y = y[:, 0]
 
-            xp = Xt1[idx * batchsize : (idx + 1) * batchsize].view(batchsize, 1, self.input_dim)
-            xp = xp.repeat(1, 3, 1)
-            xp[:, 0, self.input_dim - 1] = -1
-            xp[:, 1, self.input_dim - 1] = 0
-            xp[:, 2, self.input_dim - 1] = 1
+            xp = Xt1[idx * batchsize : (idx + 1) * batchsize]
             yp = self(xp)
             yp, _ = yp.max(dim=1)
             yp = yp.view(batchsize,)
@@ -77,6 +82,8 @@ class DQN(nn.Module):
                 fp.write('%s\n' % ' '.join(map(str, l.tolist())))
             for x in self.fc1.bias.data.cpu().numpy():
                 fp.write('%s\n' % x)
-            fp.write('%d %d\n' % (self.hidden_dim, 1))
-            fp.write('%s\n' % ' '.join(map(str, self.fc2.weight.data.cpu().numpy()[0].tolist())))
-            fp.write('%s\n' % self.fc2.bias.data.cpu().numpy()[0])
+            fp.write('%d %d\n' % (self.hidden_dim, self.output_dim))
+            for l in self.fc2.weight.data.cpu().numpy():
+                fp.write('%s\n' % ' '.join(map(str, l.tolist())))
+            for x in self.fc2.bias.data.cpu().numpy():
+                fp.write('%s\n' % x)
