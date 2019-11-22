@@ -2951,13 +2951,15 @@ static s32 dash_do_rate_adaptation_legacy_rate(GF_DashClient *dash, GF_DASH_Grou
 }
 
 /* current DASH iteration count */
-unsigned int dash_algo_call_count = 1;
+unsigned int dash_algo_call_count = 0;
 
 /* model parameters */
 int rl_D0 = -1;
 int rl_D1 = -1;
 int rl_D2 = -1;
+int rl_last_action = -1000;
 double * rl_X = NULL;
+double * rl_last_X = NULL;
 double * rl_h = NULL;
 double * rl_y = NULL;
 double * rl_W1 = NULL;
@@ -2965,6 +2967,8 @@ double * rl_b1 = NULL;
 double * rl_W2 = NULL;
 double * rl_b2 = NULL;
 const char * dash_algo_rl_model_filename = "rl_weights.txt";
+const char * rl_transitions_filename = "rl_transitions.txt";
+double rl_eps = 1.0;
 
 static void dash_rl_read_model(void)
 {
@@ -3000,8 +3004,10 @@ static void dash_rl_read_model(void)
 	for (int i = 0; i < rl_D2; i++) {
 		fscanf(fp, "%lf", rl_b2 + i);
 	}
+	fscanf(fp, "%lf", &rl_eps);
 	fclose(fp);
 	rl_X = (double *)malloc(rl_D0 * sizeof(double));
+	rl_last_X = (double *)malloc(rl_D0 * sizeof(double));
 	rl_h = (double *)malloc(rl_D1 * sizeof(double));
 	rl_y = (double *)malloc(rl_D2 * sizeof(double));
 }
@@ -3015,6 +3021,9 @@ struct {
 	double * buffersizes;
 } rl_state_history;
 const int rl_HISTORY_SIZE = 5;
+
+/* the cumulative bitrate over time */
+double rl_bitrate_integrate = 0.0;
 
 /* initialize history states structure */
 static void rl_build_state(void)
@@ -3054,9 +3063,9 @@ static void rl_add_state(double current_downloadrate, double current_bitrate, do
 static void rl_get_state(double * state, int action)
 {
 	for (int t = 0; t < rl_state_history.HISTORY_SIZE; t++) {
-		state[t * 3] = rl_state_history.downloadrates[t] / 1.0e5;
-		state[t * 3 + 1] = rl_state_history.bitrates[t] / 1.0e5;
-		state[t * 3 + 2] = rl_state_history.buffersizes[t] / 1.0e3;
+		state[t * 3] = rl_state_history.downloadrates[t] / 1.0e6;
+		state[t * 3 + 1] = rl_state_history.bitrates[t] / 1.0e6;
+		state[t * 3 + 2] = rl_state_history.buffersizes[t] / 1.0e4;
 	}
 	state[rl_state_history.HISTORY_SIZE * 3] = action * 1.0e1;
 }
@@ -3073,7 +3082,7 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 		"        BufferMin %d BufferMax %d\n"
 		"        BufferOcc %d BufferOccLastSeq %d\n"
 		"        ListCount %d\n",
-		dash_algo_call_count++, time(NULL),
+		dash_algo_call_count, time(NULL),
 		dl_rate, speed, max_available_speed,
 		rep->id, rep->bandwidth, rep->quality_ranking,
 		group->current_downloaded_segment_duration, group->bytes_per_sec, group->active_rep_index, group->active_bitrate,
@@ -3086,8 +3095,11 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 	int actions[3] = { -1, 0, 1 };
 	double values[3];
 	int max_val_idx = 0;
+	memcpy(rl_last_X, rl_X, rl_D0 * sizeof(double));
+	rl_last_X[rl_D0 - 1] = rl_last_action;
+	rl_get_state(rl_X, -1);
 	for (int ia = 0; ia < 3; ia++) {
-		rl_get_state(rl_X, actions[ia]);
+		rl_X[rl_D0 - 1] = actions[ia];
 		/*for (int i = 0; i <= rl_state_history.HISTORY_SIZE * 3; i++) {
 		printf("%f,", rl_X[i]);
 		}
@@ -3109,17 +3121,50 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 		for (int k = 0; k < rl_D1; k++) {
 			values[ia] += rl_W2[k] * rl_h[k];
 		}
-		printf("action %d value %lf\n", actions[ia], values[ia]);
 		if (values[ia] > values[max_val_idx]) {
 			max_val_idx = ia;
 		}
 	}
 
-	int new_index = group->active_rep_index + actions[max_val_idx];
+	/* eps-greedy */
+	int index_shift = 0;
+	if (rand() * 1.0 / RAND_MAX <= rl_eps) {
+		index_shift = actions[rand() % 3];
+		printf("        random choose %d epsilon %lf\n", index_shift, rl_eps);
+	}
+	else {		
+		index_shift = actions[max_val_idx];
+		printf("        highest reward %d epsilon %lf from ", index_shift, rl_eps);
+		for (int ia = 0; ia < 3; ia++) {
+			printf(" %lf", values[ia]);
+		}
+		printf("\n");
+	}
+	int new_index = group->active_rep_index + index_shift;
+
 	int list_count = gf_list_count(group->adaptation_set->representations);
 	new_index = (new_index < 0) ? 0 : new_index;
 	new_index = (new_index >= list_count) ? (list_count - 1) : new_index;
 	printf("        action %d new index %d\n", actions[max_val_idx], new_index);
+
+	/* store [St,At,Rt,St+1] */
+	if (dash_algo_call_count > 0) {
+		FILE * fp = fopen(rl_transitions_filename, "a");
+		fprintf(fp, "%d %lld\n", dash_algo_call_count, time(NULL));
+		for (int i = 0; i < rl_D0; i++) {
+			fprintf(fp, "%lf ", rl_last_X[i]);
+		}
+		/* TODO get reward at this round */
+		double Rt = group->active_bitrate / 1.0e7 + group->buffer_occupancy_ms / 1.0e4;
+		fprintf(fp, "\n%lf\n", Rt);
+		for (int i = 0; i < rl_D0; i++) {
+			fprintf(fp, "%lf ", rl_X[i]);
+		}
+		fprintf(fp, "\n");
+		fclose(fp);
+	}
+	rl_last_action = new_index - group->active_rep_index;
+	dash_algo_call_count ++;
 	return new_index;
 }
 

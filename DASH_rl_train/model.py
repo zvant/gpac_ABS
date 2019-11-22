@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 import numpy as np
+from sklearn.utils import shuffle
 
 class DQN(nn.Module):
     def __init__(self):
@@ -25,8 +26,9 @@ class DQN(nn.Module):
 
         self.loss_fn = nn.MSELoss()
         self.init_weights()
-        self.lr = 1.0e-3
+        self.lr = 3.0e-3
         self.optimizer = optim.Adam(self.parameters(), lr=self.lr)
+        self.gamma = 0.25
         self.type(self.float)
 
     def init_weights(self):
@@ -38,8 +40,35 @@ class DQN(nn.Module):
         X = self.relu(X)
         return self.fc2(X)
 
-    def train_Xy(self, X, y, epochs):
-        pass
+    def train_Xy(self, Xt, Rt, Xt1, batchsize=None):
+        N = Xt.shape[0]
+        if batchsize is None:
+            batchsize = N
+        Xt, Rt, Xt1 = shuffle(Xt, Rt, Xt1)
+        Xt, Rt, Xt1 = map(lambda arr: torch.from_numpy(arr).type(self.float), [Xt, Rt, Xt1])
+
+        avg_loss = []
+
+        for idx in range(0, N // batchsize):
+            y = self(Xt[idx * batchsize : (idx + 1) * batchsize]).view(batchsize,)
+            r = Rt[idx * batchsize : (idx + 1) * batchsize].view(batchsize,)
+
+            xp = Xt1[idx * batchsize : (idx + 1) * batchsize].view(batchsize, 1, self.input_dim)
+            xp = xp.repeat(1, 3, 1)
+            xp[:, 0, self.input_dim - 1] = -1
+            xp[:, 1, self.input_dim - 1] = 0
+            xp[:, 2, self.input_dim - 1] = 1
+            yp = self(xp)
+            yp, _ = yp.max(dim=1)
+            yp = yp.view(batchsize,)
+
+            L = self.loss_fn(r + self.gamma * yp, y)
+            self.optimizer.zero_grad()
+            L.backward()
+            self.optimizer.step()
+            avg_loss.append(float(L.detach().cpu().numpy()) / batchsize)
+
+        return np.array(avg_loss).mean()
 
     def dump_weights(self, filename):
         with open(filename, 'w') as fp:
