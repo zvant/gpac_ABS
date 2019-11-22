@@ -2983,10 +2983,8 @@ static void dash_rl_read_model(void)
 	fscanf(fp, "%ld %ld", &rl_D0, &rl_D1);
 	printf("     layer 1: %ld x %ld\n", rl_D0, rl_D1);
 	rl_W1 = (double *)malloc(rl_D0 * rl_D1 * sizeof(double));
-	for (int i = 0; i < rl_D1; i++) {
-		for (int j = 0; j < rl_D0; j++) {
-			fscanf(fp, "%lf", rl_W1 + rl_D0 * i + j);
-		}
+	for (int i = 0; i < rl_D0 * rl_D1; i++) {
+		fscanf(fp, "%lf", rl_W1 + i);
 	}
 	rl_b1 = (double *)malloc(rl_D1 * sizeof(double));
 	for (int i = 0; i < rl_D1; i++) {
@@ -2996,10 +2994,8 @@ static void dash_rl_read_model(void)
 	fscanf(fp, "%ld %ld", &rl_D1, &rl_D2);
 	printf("     layer 2: %ld x %ld\n", rl_D1, rl_D2);
 	rl_W2 = (double *)malloc(rl_D1 * rl_D2 * sizeof(double));
-	for (int i = 0; i < rl_D2; i++) {
-		for (int j = 0; j < rl_D1; j++) {
-			fscanf(fp, "%lf", rl_W2 + rl_D1 * i + j);
-		}
+	for (int i = 0; i < rl_D1 * rl_D2; i++) {
+		fscanf(fp, "%lf", rl_W2 + i);
 	}
 	rl_b2 = (double *)malloc(rl_D2 * sizeof(double));
 	for (int i = 0; i < rl_D2; i++) {
@@ -3103,7 +3099,7 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 	for (int ih = 0; ih < rl_D1; ih++) {
 		rl_h[ih] = rl_b1[ih];
 		for (int k = 0; k < rl_D0; k++) {
-			rl_h[ih] += rl_W1[ih * rl_D1 + k] * rl_X[k];
+			rl_h[ih] += rl_W1[ih * rl_D0 + k] * rl_X[k];
 		}
 		if ('r' == rl_activation) {
 			// ReLU
@@ -3124,6 +3120,21 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 	}
 	int max_val_idx = 0;
 	for (int ia = 0; ia < 3; ia++) {
+		// check NaN
+		if (rl_y[ia] != rl_y[ia]) {
+			for (int i = 0; i < rl_D0; i++) {
+				printf("%lf ", rl_X[i]);
+			}
+			printf("\n");
+			for (int i = 0; i < rl_D1; i++) {
+				printf("%lf ", rl_h[i]);
+			}
+			printf("\n");
+			for (int i = 0; i < rl_D2; i++) {
+				printf("%lf ", rl_y[i]);
+			}
+			printf("\nNaN found"); getchar(); exit(1);
+		}
 		if (rl_y[ia] > rl_y[max_val_idx]) {
 			max_val_idx = ia;
 		}
@@ -3154,7 +3165,7 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 	}
 	else {		
 		index_shift = max_val_idx - 1;
-		printf("        highest reward %d epsilon %lf from ", index_shift, rl_eps);
+		printf("        highest reward %d epsilon %lf from", index_shift, rl_eps);
 		for (int ia = 0; ia < 3; ia++) {
 			printf(" %lf", rl_y[ia]);
 		}

@@ -18,8 +18,9 @@ def train():
             fp.write('%f %s\n' % (0.85 ** episode, model.activate_desc))
         if (episode % 5) == 0:
             shutil.copyfile(weights_filename, 'rl_dqn_model_ep_%d.txt' % episode)
-        with open(transitions_filename, 'w') as fp:
-            pass
+        if (episode % 3) == 0:
+            with open(transitions_filename, 'w') as fp:
+                pass
         os.system(command)
 
         t, Xt, At, Rt, Xt1 = [], [], [], [], []
