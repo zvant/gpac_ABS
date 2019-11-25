@@ -12,27 +12,30 @@ class DQN(nn.Module):
     def __init__(self):
         super(DQN, self).__init__()
         if torch.cuda.is_available():
-            self.float = torch.cuda.FloatTensor
+            self.float = torch.cuda.DoubleTensor
             self.long = torch.cuda.LongTensor
         else:
-            self.float = torch.FloatTensor
+            self.float = torch.DoubleTensor
             self.long = torch.LongTensor
 
         self.input_dim = 5 * 3
         self.hidden_dim = 32
-        self.output_dim = 3
+        self.output_dim = 4
         self.fc1 = nn.Linear(self.input_dim, self.hidden_dim)
-        # self.activate = nn.ReLU()
+        self.fc2 = nn.Linear(self.hidden_dim, self.hidden_dim)
+        self.fc3 = nn.Linear(self.hidden_dim, self.output_dim)
+        # self.a1 = nn.ReLU()
+        # self.a2 = nn.ReLU()
         # self.activate_desc = 'r'
-        self.activate = nn.Sigmoid()
+        self.a1 = nn.Sigmoid()
+        self.a2 = nn.Sigmoid()
         self.activate_desc = 's'
-        self.fc2 = nn.Linear(self.hidden_dim, self.output_dim)
 
         self.loss_fn = nn.MSELoss()
         self.init_weights()
-        self.lr = 3.0e-3
+        self.lr = 0.5e-3
         self.optimizer = optim.Adam(self.parameters(), lr=self.lr)
-        self.gamma = 0.75
+        self.gamma = 0.85
         self.type(self.float)
 
     def init_weights(self):
@@ -41,8 +44,10 @@ class DQN(nn.Module):
 
     def forward(self, X):
         X = self.fc1(X)
-        X = self.activate(X)
-        return self.fc2(X)
+        X = self.a1(X)
+        X = self.fc2(X)
+        X = self.a2(X)
+        return self.fc3(X)
 
     def train_Xy(self, Xt, At, Rt, Xt1, batchsize=None):
         N = Xt.shape[0]
@@ -77,13 +82,16 @@ class DQN(nn.Module):
 
     def dump_weights(self, filename):
         with open(filename, 'w') as fp:
-            fp.write('%d %d\n' % (self.input_dim, self.hidden_dim))
+            fp.write('%d %d %d %d\n' % (self.input_dim, self.hidden_dim, self.hidden_dim, self.output_dim))
             for l in self.fc1.weight.data.cpu().numpy():
                 fp.write('%s\n' % ' '.join(map(str, l.tolist())))
             for x in self.fc1.bias.data.cpu().numpy():
                 fp.write('%s\n' % x)
-            fp.write('%d %d\n' % (self.hidden_dim, self.output_dim))
             for l in self.fc2.weight.data.cpu().numpy():
                 fp.write('%s\n' % ' '.join(map(str, l.tolist())))
             for x in self.fc2.bias.data.cpu().numpy():
+                fp.write('%s\n' % x)
+            for l in self.fc3.weight.data.cpu().numpy():
+                fp.write('%s\n' % ' '.join(map(str, l.tolist())))
+            for x in self.fc3.bias.data.cpu().numpy():
                 fp.write('%s\n' % x)

@@ -2957,16 +2957,19 @@ unsigned int dash_algo_call_count = 0;
 int rl_D0 = -1;
 int rl_D1 = -1;
 int rl_D2 = -1;
+int rl_D3 = -1;
 int rl_last_action = -1000;
 double * rl_X = NULL;
 double * rl_last_X = NULL;
-int rl_last_action_index = 0;
-double * rl_h = NULL;
+double * rl_h1 = NULL;
+double * rl_h2 = NULL;
 double * rl_y = NULL;
 double * rl_W1 = NULL;
 double * rl_b1 = NULL;
 double * rl_W2 = NULL;
 double * rl_b2 = NULL;
+double * rl_W3 = NULL;
+double * rl_b3 = NULL;
 const char * dash_algo_rl_model_filename = "rl_weights.txt";
 const char * rl_transitions_filename = "rl_transitions.txt";
 double rl_eps = 1.0;
@@ -2980,7 +2983,8 @@ static void dash_rl_read_model(void)
 		return;
 	}
 	printf("[RL] reading weights & biases from %s\n", dash_algo_rl_model_filename);
-	fscanf(fp, "%ld %ld", &rl_D0, &rl_D1);
+	fscanf(fp, "%ld %ld %ld %ld", &rl_D0, &rl_D1, &rl_D2, &rl_D3);
+
 	printf("     layer 1: %ld x %ld\n", rl_D0, rl_D1);
 	rl_W1 = (double *)malloc(rl_D0 * rl_D1 * sizeof(double));
 	for (int i = 0; i < rl_D0 * rl_D1; i++) {
@@ -2991,7 +2995,6 @@ static void dash_rl_read_model(void)
 		fscanf(fp, "%lf", rl_b1 + i);
 	}
 
-	fscanf(fp, "%ld %ld", &rl_D1, &rl_D2);
 	printf("     layer 2: %ld x %ld\n", rl_D1, rl_D2);
 	rl_W2 = (double *)malloc(rl_D1 * rl_D2 * sizeof(double));
 	for (int i = 0; i < rl_D1 * rl_D2; i++) {
@@ -3001,13 +3004,26 @@ static void dash_rl_read_model(void)
 	for (int i = 0; i < rl_D2; i++) {
 		fscanf(fp, "%lf", rl_b2 + i);
 	}
+
+	printf("     layer 3: %ld x %ld\n", rl_D2, rl_D3);
+	rl_W3 = (double *)malloc(rl_D2 * rl_D3 * sizeof(double));
+	for (int i = 0; i < rl_D2 * rl_D3; i++) {
+		fscanf(fp, "%lf", rl_W3 + i);
+	}
+	rl_b3 = (double *)malloc(rl_D3 * sizeof(double));
+	for (int i = 0; i < rl_D3; i++) {
+		fscanf(fp, "%lf", rl_b3 + i);
+	}
+
 	fscanf(fp, "%lf %c", &rl_eps, &rl_activation);
 	fclose(fp);
-	printf("     activation function %c\n", rl_activation);
+	printf("     activation function: %c\n", rl_activation);
+
 	rl_X = (double *)malloc(rl_D0 * sizeof(double));
 	rl_last_X = (double *)malloc(rl_D0 * sizeof(double));
-	rl_h = (double *)malloc(rl_D1 * sizeof(double));
-	rl_y = (double *)malloc(rl_D2 * sizeof(double));
+	rl_h1 = (double *)malloc(rl_D1 * sizeof(double));
+	rl_h2 = (double *)malloc(rl_D2 * sizeof(double));
+	rl_y = (double *)malloc(rl_D3 * sizeof(double));
 }
 
 /* model inputs, the current state */
@@ -3020,8 +3036,90 @@ struct {
 } rl_state_history;
 const int rl_HISTORY_SIZE = 5;
 
-/* the cumulative bitrate over time */
-double rl_bitrate_integrate = 0.0;
+/* evaluate actions using DQN */
+static void rl_inference(void)
+{
+	for (int i1 = 0; i1 < rl_D1; i1++) {
+		rl_h1[i1] = rl_b1[i1];
+		for (int k = 0; k < rl_D0; k++) {
+			rl_h1[i1] += rl_W1[i1 * rl_D0 + k] * rl_X[k];
+		}
+		if ('r' == rl_activation) {
+			// ReLU
+			if (rl_h1[i1] < 0.0) {
+				rl_h1[i1] = 0.0;
+			}
+		}
+		else {
+			//Sigmoid
+			rl_h1[i1] = 1.0 / (1 + exp(-1 * rl_h1[i1]));
+		}
+	}
+
+	for (int i2 = 0; i2 < rl_D2; i2++) {
+		rl_h2[i2] = rl_b2[i2];
+		for (int k = 0; k < rl_D1; k++) {
+			rl_h2[i2] += rl_W2[i2 * rl_D1 + k] * rl_h1[k];
+		}
+		if ('r' == rl_activation) {
+			// ReLU
+			if (rl_h2[i2] < 0.0) {
+				rl_h2[i2] = 0.0;
+			}
+		}
+		else {
+			//Sigmoid
+			rl_h2[i2] = 1.0 / (1 + exp(-1 * rl_h2[i2]));
+		}
+	}
+
+	for (int ia = 0; ia < rl_D3; ia++) {
+		rl_y[ia] = rl_b3[ia];
+		for (int k = 0; k < rl_D2; k++) {
+			rl_y[ia] += rl_W3[ia * rl_D2 + k] * rl_h2[k];
+		}
+	}
+
+	/* check NaN */
+	for (int ia = 0; ia < rl_D3; ia++) {
+		if (rl_y[ia] != rl_y[ia]) {
+			for (int i = 0; i < rl_D0; i++) {
+				printf("%lf ", rl_X[i]);
+			}
+			printf("\n");
+			for (int i = 0; i < rl_D1; i++) {
+				printf("%lf ", rl_h1[i]);
+			}
+			printf("\n");
+			for (int i = 0; i < rl_D2; i++) {
+				printf("%lf ", rl_h2[i]);
+			}
+			printf("\n");
+			for (int i = 0; i < rl_D2; i++) {
+				printf("%lf ", rl_y[i]);
+			}
+			printf("\nNaN found"); getchar(); exit(1);
+		}
+	}
+}
+
+static void rl_verify(void)
+{
+	for (int i = 0; i < rl_D0; i++) {
+		rl_X[i] = (i % 2) * 2 - 1.0;
+	}
+	rl_inference();
+	printf("[VERIFY] ");
+	for (int i = 0; i < rl_D0; i++) {
+		printf("%.2lf ", rl_X[i]);
+	}
+	printf("\n         ");
+	for (int i = 0; i < rl_D3; i++) {
+		printf("%lf ", rl_y[i]);
+	}
+	printf("\n");
+	fflush(stdout);
+}
 
 /* initialize history states structure */
 static void rl_build_state(void)
@@ -3071,74 +3169,43 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 									u32 dl_rate, Double speed, Double max_available_speed, Bool force_lower_complexity,
 									GF_MPD_Representation *rep, Bool go_up_bitrate)
 {
+	fflush(stdout);
 	printf(
 		"[DEBUG] dash_do_rate_adaptation_legacy_buffer #%d @%lld\n"
 		"        DownloadRate %d Speed %lf MaxSpeed %lf\n"
-		"        ID %s Bandwidth %d Rank %d\n"
+		"        ID %s Bandwidth %d Rank %d ListCount %d\n"
 		"        Length %lld Bps %d ActiveRepIdx %d ActiveBR %d\n"
 		"        BufferMin %d BufferMax %d\n"
-		"        BufferOcc %d BufferOccLastSeq %d\n"
-		"        ListCount %d\n",
+		"        BufferOcc %d BufferOccLastSeq %d\n",
 		dash_algo_call_count, time(NULL),
 		dl_rate, speed, max_available_speed,
-		rep->id, rep->bandwidth, rep->quality_ranking,
+		rep->id, rep->bandwidth, rep->quality_ranking, gf_list_count(group->adaptation_set->representations),
 		group->current_downloaded_segment_duration, group->bytes_per_sec, group->active_rep_index, group->active_bitrate,
 		group->buffer_min_ms, group->buffer_max_ms,
-		group->buffer_occupancy_ms, group->buffer_occupancy_at_last_seg,
-		gf_list_count(group->adaptation_set->representations));
+		group->buffer_occupancy_ms, group->buffer_occupancy_at_last_seg);
 
-	/* evaluate actions using Q-network */
+	int list_count = gf_list_count(group->adaptation_set->representations);
+	if (list_count != rl_D3) {
+		printf("        mismatch: DASHList %d DQN output %d\n", list_count, rl_D3);
+		return 0;
+	}
+
 	rl_add_state(dl_rate, group->active_bitrate, group->buffer_occupancy_ms);
 	memcpy(rl_last_X, rl_X, rl_D0 * sizeof(double));
 	rl_get_state(rl_X);
+	rl_inference();
 
-	/*for (int i = 0; i <= rl_state_history.HISTORY_SIZE * 3; i++) {
-	printf("%f,", rl_X[i]);
-	}
-	printf("\n");*/
-	for (int ih = 0; ih < rl_D1; ih++) {
-		rl_h[ih] = rl_b1[ih];
-		for (int k = 0; k < rl_D0; k++) {
-			rl_h[ih] += rl_W1[ih * rl_D0 + k] * rl_X[k];
-		}
-		if ('r' == rl_activation) {
-			// ReLU
-			if (rl_h[ih] < 0.0) {
-				rl_h[ih] = 0.0;
-			}
-		}
-		else {
-			//Sigmoid
-			rl_h[ih] = 1.0 / (1 + pow(2.71828, -1 * rl_h[ih]));
+	int new_index = 0;
+	for (int ia = 0; ia < rl_D3; ia++) {
+		if (rl_y[ia] > rl_y[new_index]) {
+			new_index = ia;
 		}
 	}
-	for (int ia = 0; ia < 3; ia++) {
-		rl_y[ia] = rl_b2[ia];
-		for (int k = 0; k < rl_D1; k++) {
-			rl_y[ia] += rl_W2[ia * rl_D1 + k] * rl_h[k];
-		}
+	printf("        ");
+	for (int ia = 0; ia < rl_D3; ia++) {
+		printf("%d: %lf ", ia, rl_y[ia]);
 	}
-	int max_val_idx = 0;
-	for (int ia = 0; ia < 3; ia++) {
-		// check NaN
-		if (rl_y[ia] != rl_y[ia]) {
-			for (int i = 0; i < rl_D0; i++) {
-				printf("%lf ", rl_X[i]);
-			}
-			printf("\n");
-			for (int i = 0; i < rl_D1; i++) {
-				printf("%lf ", rl_h[i]);
-			}
-			printf("\n");
-			for (int i = 0; i < rl_D2; i++) {
-				printf("%lf ", rl_y[i]);
-			}
-			printf("\nNaN found"); getchar(); exit(1);
-		}
-		if (rl_y[ia] > rl_y[max_val_idx]) {
-			max_val_idx = ia;
-		}
-	}
+	printf("\n");
 
 	/* store [St,At,Rt,St+1] */
 	if (dash_algo_call_count > 0) {
@@ -3148,8 +3215,9 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 			fprintf(fp, "%lf ", rl_last_X[i]);
 		}
 		/* TODO get reward at this round */
-		double Rt = group->active_bitrate / 1.0e7 + group->buffer_occupancy_ms / 1.0e4;
-		fprintf(fp, "\n%d %lf\n", rl_last_action_index, Rt);
+		double Rt = group->active_bitrate / 1.0e7;
+		//double Rt = group->active_bitrate / 1.0e7 + group->buffer_occupancy_ms / 1.0e4;
+		fprintf(fp, "\n%d %lf\n", rl_last_action, Rt);
 		for (int i = 0; i < rl_D0; i++) {
 			fprintf(fp, "%lf ", rl_X[i]);
 		}
@@ -3160,25 +3228,15 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 	/* eps-greedy */
 	int index_shift = 0;
 	if (rand() * 1.0 / RAND_MAX <= rl_eps) {
-		index_shift = (rand() % 3) - 1;
-		printf("        random choose %d epsilon %lf\n", index_shift, rl_eps);
+		new_index = rand() % list_count;
+		printf("        random choose %d epsilon %lf\n", new_index, rl_eps);
 	}
-	else {		
-		index_shift = max_val_idx - 1;
-		printf("        highest reward %d epsilon %lf from", index_shift, rl_eps);
-		for (int ia = 0; ia < 3; ia++) {
-			printf(" %lf", rl_y[ia]);
-		}
-		printf("\n");
+	else {
+		printf("        highest reward %d epsilon %lf\n", new_index, rl_eps);
 	}
-	int new_index = group->active_rep_index + index_shift;
-	int list_count = gf_list_count(group->adaptation_set->representations);
-	new_index = (new_index < 0) ? 0 : new_index;
-	new_index = (new_index >= list_count) ? (list_count - 1) : new_index;
 	printf("        new index %d\n", new_index);
 
-	rl_last_action = new_index - group->active_rep_index;
-	rl_last_action_index = rl_last_action + 1;
+	rl_last_action = new_index;
 	dash_algo_call_count ++;
 	return new_index;
 }
@@ -7327,6 +7385,7 @@ void gf_dash_set_algo(GF_DashClient *dash, GF_DASHAdaptationAlgorithm algo)
 	case GF_DASH_ALGO_RL:
 		printf("[DEBUG] GF_DASH_ALGO_RL\n");
 		dash_rl_read_model();
+		rl_verify();
 		rl_build_state();
 		dash->rate_adaptation_algo = dash_do_rate_adaptation_rl;
 		dash->rate_adaptation_download_monitor = dash_do_rate_monitor_default;
