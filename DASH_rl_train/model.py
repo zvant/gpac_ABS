@@ -24,12 +24,12 @@ class DQN(nn.Module):
         self.fc1 = nn.Linear(self.input_dim, self.hidden_dim)
         self.fc2 = nn.Linear(self.hidden_dim, self.hidden_dim)
         self.fc3 = nn.Linear(self.hidden_dim, self.output_dim)
-        # self.a1 = nn.ReLU()
-        # self.a2 = nn.ReLU()
-        # self.activate_desc = 'r'
-        self.a1 = nn.Sigmoid()
-        self.a2 = nn.Sigmoid()
-        self.activate_desc = 's'
+        self.a1 = nn.ReLU()
+        self.a2 = nn.ReLU()
+        self.activate_desc = 'r'
+        # self.a1 = nn.Sigmoid()
+        # self.a2 = nn.Sigmoid()
+        # self.activate_desc = 's'
 
         self.loss_fn = nn.MSELoss()
         self.init_weights()

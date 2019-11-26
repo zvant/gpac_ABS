@@ -3215,8 +3215,8 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 			fprintf(fp, "%lf ", rl_last_X[i]);
 		}
 		/* TODO get reward at this round */
-		double Rt = group->active_bitrate / 1.0e7;
-		//double Rt = group->active_bitrate / 1.0e7 + group->buffer_occupancy_ms / 1.0e4;
+		double bitrate_alpha = 0.9;
+		double Rt = bitrate_alpha * group->active_bitrate / 1.0e7 + (1 - bitrate_alpha) * group->buffer_occupancy_ms / 1.0e4;
 		fprintf(fp, "\n%d %lf\n", rl_last_action, Rt);
 		for (int i = 0; i < rl_D0; i++) {
 			fprintf(fp, "%lf ", rl_X[i]);
