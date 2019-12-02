@@ -91,6 +91,7 @@ tests/results/
 
 # learned models
 *.txt
+*.csv
 *.npz
 *.npy
 *.pyc

@@ -3206,7 +3206,7 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 		printf("%d: %lf ", ia, rl_y[ia]);
 	}
 	printf("\n");
-
+	
 	/* store [St,At,Rt,St+1] */
 	if (dash_algo_call_count > 0) {
 		FILE * fp = fopen(rl_transitions_filename, "a");
@@ -3214,8 +3214,7 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 		for (int i = 0; i < rl_D0; i++) {
 			fprintf(fp, "%lf ", rl_last_X[i]);
 		}
-		/* TODO get reward at this round */
-		double bitrate_alpha = 0.9;
+		double bitrate_alpha = 0.0;
 		double Rt = bitrate_alpha * group->active_bitrate / 1.0e7 + (1 - bitrate_alpha) * group->buffer_occupancy_ms / 1.0e4;
 		fprintf(fp, "\n%d %lf\n", rl_last_action, Rt);
 		for (int i = 0; i < rl_D0; i++) {
@@ -3235,6 +3234,17 @@ static s32 dash_do_rate_adaptation_rl(GF_DashClient *dash, GF_DASH_Group *group,
 		printf("        highest reward %d epsilon %lf\n", new_index, rl_eps);
 	}
 	printf("        new index %d\n", new_index);
+
+	/* logging */
+	if(1) {
+		FILE * fp = fopen("rewards.csv", "a");
+		fprintf(fp, "%d,%d,%.4lf,%.4lf,%.4lf\n", dash_algo_call_count, new_index, group->active_bitrate / 1.0e7, group->buffer_occupancy_ms / 1.0e4, clock() * 1.0 / CLOCKS_PER_SEC);
+		fclose(fp);
+		if (dash_algo_call_count >= 19) {
+			printf("exit\n");
+			exit(0);
+		}
+	}
 
 	rl_last_action = new_index;
 	dash_algo_call_count ++;
