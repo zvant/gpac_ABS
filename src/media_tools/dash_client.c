@@ -3114,7 +3114,7 @@ static s32 dash_do_rate_adaptation_legacy_buffer(GF_DashClient *dash, GF_DASH_Gr
 		new_index = dash_do_rate_adaptation_legacy_rate(dash, group, base_group, dl_rate, speed, max_available_speed, force_lower_complexity, rep, go_up_bitrate);
 	}
 
-	printf("        new index %d\n", new_index);
+	//printf("        new index %d\n", new_index);
 	return new_index;
 }
 
@@ -3167,6 +3167,19 @@ static s32 dash_do_rate_adaptation_bba0(GF_DashClient *dash, GF_DASH_Group *grou
 												  u32 dl_rate, Double speed, Double max_available_speed, Bool force_lower_complexity,
 												  GF_MPD_Representation *rep, Bool go_up_bitrate)
 {
+	printf(
+		"[DEBUG] dash_do_rate_adaptation_bba0 #%d @%lld\n"
+		"        DownloadRate %d Speed %lf MaxSpeed %lf\n"
+		"        ID %s Bandwidth %d Rank %d\n"
+		"        Length %lld Bps %d\n"
+		"        BufferMin %d BufferMax %d\n"
+		"        BufferOcc %d BufferOccLastSeq %d\n",
+		dash_algo_call_count ++, time(NULL), dl_rate, speed, max_available_speed,
+		rep->id, rep->bandwidth, rep->quality_ranking,
+		group->current_downloaded_segment_duration, group->bytes_per_sec,
+		group->buffer_min_ms, group->buffer_max_ms,
+		group->buffer_occupancy_ms, group->buffer_occupancy_at_last_seg);
+
 	u32 rate_plus;
 	u32 rate_minus;
 	u32 rate_prev = group->active_bitrate;
@@ -3186,10 +3199,10 @@ static s32 dash_do_rate_adaptation_bba0(GF_DashClient *dash, GF_DASH_Group *grou
 	/* if the current buffer cannot hold an entire new segment, we indicate that we don't want to download it
 	   NOTE: This is not described in the paper
 	*/
-	if (group->buffer_occupancy_ms + segment_duration_ms > group->buffer_max_ms) {
-		GF_LOG(GF_LOG_DEBUG, GF_LOG_DASH, ("[DASH] BBA-0: not enough space to download new segment: %d\n", group->buffer_occupancy_ms));
-		return -1;
-	}
+	//if (group->buffer_occupancy_ms + segment_duration_ms > group->buffer_max_ms) {
+	//	GF_LOG(GF_LOG_DEBUG, GF_LOG_DASH, ("[DASH] BBA-0: not enough space to download new segment: %d\n", group->buffer_occupancy_ms));
+	//	return -1;
+	//}
 
     if (rate_prev == rate_max) {
     	rate_plus = rate_max;
@@ -3209,10 +3222,10 @@ static s32 dash_do_rate_adaptation_bba0(GF_DashClient *dash, GF_DASH_Group *grou
      * the size of cushion is between 37.5% and 90% of the buffer size
 	 * the rate map is piece-wise
      */
-	if (group->buffer_max_ms <= segment_duration_ms) {
-		GF_LOG(GF_LOG_ERROR, GF_LOG_DASH, ("[DASH] BBA-0: cannot initialize BBA-0 given the buffer size (%d) and segment duration (%d)\n", group->buffer_max_ms, group->segment_duration*1000));
-		return -1;
-	}
+	//if (group->buffer_max_ms <= segment_duration_ms) {
+	//	GF_LOG(GF_LOG_ERROR, GF_LOG_DASH, ("[DASH] BBA-0: cannot initialize BBA-0 given the buffer size (%d) and segment duration (%d)\n", group->buffer_max_ms, group->segment_duration*1000));
+	//	return -1;
+	//}
 	r = (u32)(37.5*group->buffer_max_ms / 100);
 	if (r < segment_duration_ms) {
 		r = segment_duration_ms;
@@ -3296,7 +3309,7 @@ static s32 dash_do_rate_adaptation_bola(GF_DashClient *dash, GF_DASH_Group *grou
 	Double gamma = (double)5/(double)p;
 	Double Qmax = group->buffer_max_ms / 1000.0 / p;		// max nb of segments in the buffer
 	Double Q = group->buffer_occupancy_ms / 1000.0 / p;		// current buffer occupancy in number of segments
-
+	
 	GF_MPD_Representation *min_rep;
 	GF_MPD_Representation *max_rep;
 	u32 nb_reps;
@@ -3322,12 +3335,45 @@ static s32 dash_do_rate_adaptation_bola(GF_DashClient *dash, GF_DASH_Group *grou
 		// NOTE in BOLA, representation indices decrease when the quality increases [1 = best quality]
 		Double V = (Qmax - 1) / (gamma * p + max_rep->playback.bola_v);
 		new_index = bola_find_max_utility_index(group->adaptation_set->representations, V, gamma, p, Q);
+
+		//printf("LOOK HERE! %f - %f\n", Q, Qmax);
+		//printf("segment duration: %f\n", p);
+
+		printf(
+			"[DEBUG] dash_do_rate_adaptation_BOLA_BASIC #%d @%lld\n"
+			"        DownloadRate %d Speed %lf MaxSpeed %lf\n"
+			"        ID %s Bandwidth %d Rank %d\n"
+			"        Length %lld Bps %d\n"
+			"        BufferMin %d BufferMax %d\n"
+			"        BufferOcc %d BufferOccLastSeq %d\n",
+			dash_algo_call_count ++, time(NULL), dl_rate, speed, max_available_speed,
+			rep->id, rep->bandwidth, rep->quality_ranking,
+			group->current_downloaded_segment_duration, group->bytes_per_sec,
+			group->buffer_min_ms, group->buffer_max_ms,
+			group->buffer_occupancy_ms, group->buffer_occupancy_at_last_seg);
+
+
+
 	}
 	else if (dash->adaptation_algorithm == GF_DASH_ALGO_BOLA_FINITE ||
 		dash->adaptation_algorithm == GF_DASH_ALGO_BOLA_O ||
 		dash->adaptation_algorithm == GF_DASH_ALGO_BOLA_U) {
 		/* BOLA FINITE is the same as BOLA Basic with the wind-up and down phases */
 		/* BOLA O and U add extra steps to BOLA FINITE */
+
+		printf(
+			"[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #%d @%lld\n"
+			"        DownloadRate %d Speed %lf MaxSpeed %lf\n"
+			"        ID %s Bandwidth %d Rank %d\n"
+			"        Length %lld Bps %d\n"
+			"        BufferMin %d BufferMax %d\n"
+			"        BufferOcc %d BufferOccLastSeq %d\n",
+			dash_algo_call_count ++, time(NULL), dl_rate, speed, max_available_speed,
+			rep->id, rep->bandwidth, rep->quality_ranking,
+			group->current_downloaded_segment_duration, group->bytes_per_sec,
+			group->buffer_min_ms, group->buffer_max_ms,
+			group->buffer_occupancy_ms, group->buffer_occupancy_at_last_seg);
+
 		Double t_bgn; //play time from begin
 		Double t_end; //play time to the end
 		Double t;

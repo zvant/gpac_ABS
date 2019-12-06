@@ -1,0 +1,258 @@
+[DEBUG] mp4client_main entry @1575397343
+[DEBUG] ARGS 0 MP4Client
+[DEBUG] ARGS 1 -c
+[DEBUG] ARGS 2 GPAC.cfg
+[DEBUG] ARGS 3 http://127.0.0.1:8000/dash.mpd
+[DEBUG] GF_DASH_ALGO_BBA0
+[DEBUG] dash_do_rate_adaptation_bba0 #1 @1575397354
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.000000
+        ID 4 Bandwidth 649229 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 1 BufferMax 1500
+        BufferOcc 10332 BufferOccLastSeq 0
+[DEBUG] dash_do_rate_adaptation_bba0 #2 @1575397363
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.000000
+        ID 4 Bandwidth 649229 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 1 BufferMax 1500
+        BufferOcc 18699 BufferOccLastSeq 10332
+[DEBUG] dash_do_rate_adaptation_bba0 #3 @1575397393
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.120325
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 1705 BufferOccLastSeq 18699
+[DEBUG] dash_do_rate_adaptation_bba0 #4 @1575397398
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.500612
+        ID 4 Bandwidth 649229 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 9389 BufferOccLastSeq 1705
+[DEBUG] dash_do_rate_adaptation_bba0 #5 @1575397402
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.500612
+        ID 4 Bandwidth 649229 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 17331 BufferOccLastSeq 9389
+[DEBUG] dash_do_rate_adaptation_bba0 #6 @1575397443
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.120325
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 17331
+[DEBUG] dash_do_rate_adaptation_bba0 #7 @1575397450
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #8 @1575397472
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #9 @1575397482
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #10 @1575397492
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #11 @1575397499
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #12 @1575397506
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #13 @1575397511
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #14 @1575397522
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #15 @1575397528
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #16 @1575397543
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #17 @1575397561
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #18 @1575397566
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #19 @1575397573
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 13070 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #20 @1575397588
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.120325
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 13070
+[DEBUG] dash_do_rate_adaptation_bba0 #21 @1575397602
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #22 @1575397611
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #23 @1575397618
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 16152 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #24 @1575397642
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.120325
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 16152
+[DEBUG] dash_do_rate_adaptation_bba0 #25 @1575397656
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #26 @1575397669
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #27 @1575397687
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #28 @1575397694
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #29 @1575397727
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #30 @1575397758
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #31 @1575397768
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #32 @1575397794
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #33 @1575397813
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #34 @1575397837
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #35 @1575397851
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #36 @1575397860
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #37 @1575397861
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #38 @1575397893
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #39 @1575397904
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #40 @1575397918
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #41 @1575397934
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041
+[DEBUG] dash_do_rate_adaptation_bba0 #42 @1575397937
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.315348
+        ID 3 Bandwidth 1030647 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 12041 BufferOccLastSeq 12041

@@ -1,0 +1,258 @@
+[DEBUG] mp4client_main entry @1575484912
+[DEBUG] ARGS 0 MP4Client
+[DEBUG] ARGS 1 -c
+[DEBUG] ARGS 2 GPAC.cfg
+[DEBUG] ARGS 3 http://127.0.0.1:8000/dash.mpd
+[DEBUG] GF_DASH_ALGO_BOLA_O
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #1 @1575484918
+        DownloadRate 1877352 Speed 1.000000 MaxSpeed 0.000000
+        ID 4 Bandwidth 649229 Rank 0
+        Length 12000 Bps 234669
+        BufferMin 1 BufferMax 1500
+        BufferOcc 10332 BufferOccLastSeq 0
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #2 @1575484932
+        DownloadRate 1877352 Speed 1.000000 MaxSpeed 0.000000
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 234669
+        BufferMin 0 BufferMax 1500
+        BufferOcc 13715 BufferOccLastSeq 10332
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #3 @1575484964
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.120325
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 13715
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #4 @1575484978
+        DownloadRate 1031440 Speed 1.000000 MaxSpeed 0.190928
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 128930
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #5 @1575485009
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.120325
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #6 @1575485036
+        DownloadRate 1031440 Speed 1.000000 MaxSpeed 0.190928
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 128930
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #7 @1575485047
+        DownloadRate 1031440 Speed 1.000000 MaxSpeed 0.190928
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 128930
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #8 @1575485061
+        DownloadRate 2701920 Speed 1.000000 MaxSpeed 0.500147
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 337740
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #9 @1575485068
+        DownloadRate 2701920 Speed 1.000000 MaxSpeed 0.500147
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 337740
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #10 @1575485081
+        DownloadRate 1877352 Speed 1.000000 MaxSpeed 0.347513
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 234669
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #11 @1575485094
+        DownloadRate 1031440 Speed 1.000000 MaxSpeed 0.190928
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 128930
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #12 @1575485103
+        DownloadRate 1877352 Speed 1.000000 MaxSpeed 0.347513
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 234669
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #13 @1575485111
+        DownloadRate 1031440 Speed 1.000000 MaxSpeed 0.190928
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 128930
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #14 @1575485151
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.120325
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #15 @1575485168
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.120325
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #16 @1575485182
+        DownloadRate 1877352 Speed 1.000000 MaxSpeed 0.347513
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 234669
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #17 @1575485211
+        DownloadRate 1031440 Speed 1.000000 MaxSpeed 0.190928
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 128930
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #18 @1575485215
+        DownloadRate 2701920 Speed 1.000000 MaxSpeed 0.500147
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 337740
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #19 @1575485218
+        DownloadRate 2701920 Speed 1.000000 MaxSpeed 0.500147
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 337740
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #20 @1575485220
+        DownloadRate 2701920 Speed 1.000000 MaxSpeed 0.500147
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 337740
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #21 @1575485403
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.120325
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #22 @1575485417
+        DownloadRate 1031440 Speed 1.000000 MaxSpeed 0.190928
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 128930
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #23 @1575485422
+        DownloadRate 2701920 Speed 1.000000 MaxSpeed 0.500147
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 337740
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #24 @1575485434
+        DownloadRate 1877352 Speed 1.000000 MaxSpeed 0.347513
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 234669
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #25 @1575485449
+        DownloadRate 1877352 Speed 1.000000 MaxSpeed 0.347513
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 234669
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #26 @1575485460
+        DownloadRate 2701920 Speed 1.000000 MaxSpeed 0.500147
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 337740
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #27 @1575485526
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.120325
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #28 @1575485540
+        DownloadRate 1031440 Speed 1.000000 MaxSpeed 0.190928
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 128930
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #29 @1575485575
+        DownloadRate 1877352 Speed 1.000000 MaxSpeed 0.347513
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 234669
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #30 @1575485621
+        DownloadRate 1031440 Speed 1.000000 MaxSpeed 0.190928
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 128930
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #31 @1575485649
+        DownloadRate 1877352 Speed 1.000000 MaxSpeed 0.347513
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 234669
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #32 @1575485675
+        DownloadRate 1877352 Speed 1.000000 MaxSpeed 0.347513
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 234669
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #33 @1575485753
+        DownloadRate 650024 Speed 1.000000 MaxSpeed 0.120325
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 81253
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #34 @1575485780
+        DownloadRate 1031440 Speed 1.000000 MaxSpeed 0.190928
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 128930
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #35 @1575485790
+        DownloadRate 1877352 Speed 1.000000 MaxSpeed 0.347513
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 234669
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #36 @1575485801
+        DownloadRate 2701920 Speed 1.000000 MaxSpeed 0.500147
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 337740
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #37 @1575485802
+        DownloadRate 2701920 Speed 1.000000 MaxSpeed 0.500147
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 337740
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #38 @1575485833
+        DownloadRate 1877352 Speed 1.000000 MaxSpeed 0.347513
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 234669
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #39 @1575485850
+        DownloadRate 1877352 Speed 1.000000 MaxSpeed 0.347513
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 234669
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #40 @1575485874
+        DownloadRate 1031440 Speed 1.000000 MaxSpeed 0.190928
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 128930
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #41 @1575485887
+        DownloadRate 2701920 Speed 1.000000 MaxSpeed 0.500147
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 337740
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41
+[DEBUG] dash_do_rate_adaptation_BOLA_FINITE #42 @1575485889
+        DownloadRate 2701920 Speed 1.000000 MaxSpeed 0.500147
+        ID 1 Bandwidth 2701125 Rank 0
+        Length 12000 Bps 337740
+        BufferMin 0 BufferMax 1500
+        BufferOcc 41 BufferOccLastSeq 41

@@ -52,8 +52,9 @@
     <link rel="stylesheet" href="controlbar.css">
     <script src="ControlBar.js"></script>
     <script class="code">
-    var url = "http://127.0.0.1:8080/dash.mpd";
-    // var url = "https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd";
+    var url = "http://0.0.0.0:8080/dash_tiled.mpd";
+    //var url = "http://127.0.0.1:8080/dash.mpd";
+    //var url = "https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd";
     var player = dashjs.MediaPlayer().create();
     setInterval(updateStats,500);
     function updateStats()
